@@ -1,0 +1,27 @@
+def hola_mundo(){
+    print_text("hola mundo")
+}
+def suma(a:int,b:int){
+    print_int(a+b)
+}
+def ano()->int{
+    return 2
+}
+def start(){
+    hola_mundo()
+    suma(30,30)
+}
+//traducido a :
+fn hola_mundo(){
+    println!("{}","hola mundo".to_string());
+}
+fn suma(a:isize,b:isize)->isize{
+    println!("{}",a.clone()+b.clone());
+}
+fn ano()->isize{
+    return 2;
+}
+fn main(){
+    hola_mundo();
+    suma(30,30);
+}

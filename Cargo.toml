@@ -1,0 +1,10 @@
+[package]
+name = "nQuick"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+Language = { path = "Language" }
+# C:\Users\troxz\OneDrive\Documentos\dev\nQuick\Language

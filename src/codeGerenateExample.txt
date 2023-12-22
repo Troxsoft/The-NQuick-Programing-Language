@@ -1,0 +1,9 @@
+/*
+hola mundo:
+print("hola mundo")
+
+*/
+
+fn main(){
+println!("{}","hola mundo".to_string());
+}
