@@ -234,32 +234,56 @@ pub fn interpretate(
                     k += 1;
                 }
             } else {
-                let mut k: usize = i;
-                while k < tokens.len() || tokens[k].get_type() != TokensTypes::END_LINE {
+                let mut k20: usize = i;
+                while k20.clone() < tokens.len() && tokens[k20].get_type() != TokensTypes::END_LINE
+                {
                     //println!("index k:{}", k);
-                    if k + 1 >= tokens.len() {
+                    if k20 + 1 > tokens.len() {
                         break;
-                    }
-                    if k + 2 < tokens.len() {
-                        let mut vec_t99: Vec<Token> = Vec::new();
-                        vec_t99.push(tokens[k].clone());
-                        vec_t99.push(tokens[k + 1].clone());
-                        vec_t99.push(tokens[k + 2].clone());
-                        if is_math_operation(vec_t99.clone()) {
-                            let mut h40: Result<Token, String> = tranform_math_to_result(vec_t99);
-                            if (h40.is_err()) {
-                                err_txt = h40.err().unwrap();
-                            } else {
-                                tokens[k] = h40.ok().unwrap();
-                                tokens[k + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                                tokens[k + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                    } else {
+                        if tokens[k20].get_type() == TokensTypes::TEXT
+                            && tokens[k20 + 1].get_type() != TokensTypes::EQUAL
+                        {
+                            if vars.get(tokens[k20].get_value().as_str()).is_some() {
+                                let name_of_var: String = tokens[k20].get_value();
+                                tokens[k20] = vars.get(name_of_var.as_str()).unwrap().clone();
                             }
                         }
                     }
 
-                    k += 1;
+                    k20 += 1;
                 }
             }
+            tokens = Token::ignore_space_tokens(tokens);
+            current_token = tokens[i].clone();
+            let mut k: usize = i;
+            while k.clone() < tokens.len() && tokens[k].get_type() != TokensTypes::END_LINE {
+                //println!("index k:{}", k);
+                if k + 1 >= tokens.len() {
+                    break;
+                }
+                if k + 2 < tokens.len() {
+                    let mut vec_t99: Vec<Token> = Vec::new();
+                    vec_t99.push(tokens[k].clone());
+                    vec_t99.push(tokens[k + 1].clone());
+                    vec_t99.push(tokens[k + 2].clone());
+                    if is_math_operation(vec_t99.clone()) {
+                        let mut h40: Result<Token, String> = tranform_math_to_result(vec_t99);
+                        if (h40.is_err()) {
+                            err_txt = h40.err().unwrap();
+                        } else {
+                            tokens[k] = h40.ok().unwrap();
+                            tokens[k + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                            tokens[k + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                        }
+                    }
+                }
+
+                k += 1;
+            }
+
+            tokens = Token::ignore_space_tokens(tokens);
+            current_token = tokens[i].clone();
 
             tokens = Token::ignore_space_tokens(tokens);
             current_token = tokens[i].clone();
@@ -405,6 +429,6 @@ pub fn interpretate(
     if err_txt != "" {
         println!(" \nRUNTIME ERROR :(\n {}\n", err_txt);
     }
-    println!("{:#?}", tokens);
+
     vars
 }

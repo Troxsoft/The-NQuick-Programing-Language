@@ -1,4 +1,9 @@
-writeln_int(2+2)
-writeln_float(4000.30 -300.2)
-writeln_int(2*2)
-writeln_int(2/2)
+let numero:int = 40+40
+writeln_int(numero+2)
+let texto:string = "hola"
+texto = "como estas ??"
+writeln_text(texto)
+writeln_float(2.4-0.3)
+numero = 10
+writeln_int(2*numero)
+writeln_int(numero/2)

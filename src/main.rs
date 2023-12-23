@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, time::Instant};
 
 use Language::{
     format_and_clean_code, GenerateCode::interpretate, Lexer::Lexer, LexerError::LexerError,
@@ -6,6 +6,7 @@ use Language::{
 };
 
 fn main() {
+    let start_time = Instant::now();
     let code: String = format_and_clean_code(fs::read_to_string("test.nq").ok().unwrap());
 
     let mut lexer: Lexer = Lexer::new(code.clone());
@@ -25,8 +26,15 @@ fn main() {
             "false".to_string(),
             Token::new("1".to_string(), Language::Token::TokensTypes::INT_TYPE),
         );
-        let mut varfff = interpretate(tokens2.clone(), vars);
-        // println!("{:#?}", varfff);
+        // println!("{:?}", interpretate(tokens2.clone(), vars));
+        interpretate(tokens2.clone(), vars);
+        let elapsed = start_time.elapsed();
+        println!(
+            "interpreted in \n millisegunds: {}\n segunds: {}\n nano-segunds: {}",
+            elapsed.as_millis(),
+            elapsed.as_secs(),
+            elapsed.as_nanos()
+        );
     }
 
     //println!("{}", code.clone());
