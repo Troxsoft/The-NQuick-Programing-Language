@@ -1,9 +1,12 @@
-let numero:int = 40+40
-writeln_int(numero+2)
-let texto:string = "hola"
-texto = "como estas ??"
-writeln_text(texto)
-writeln_float(2.4-0.3)
-numero = 10
-writeln_int(2*numero)
-writeln_int(numero/2)
+let numero:float = 10.8
+println(numero -10.0)
+println(numero /1.0)
+numero = numero + numero
+let otro_numero:int = 30
+
+println (  otro_numero -0)
+println(numero *2.0)
+
+let mensaje:string = "hola mundo"
+mensaje = "no hola"
+println(mensaje)

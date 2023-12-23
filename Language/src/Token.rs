@@ -25,8 +25,13 @@ pub enum TokensTypes {
     BRACKET_END,
     FUNCTION,
     COMMA,
-
     RETURN_SYMBOL,
+    IF_IS_EQUALS,
+    IF_CONDITION,
+    IF_IS_GREATER,
+    IF_IS_LESS,
+    IF_IS_GREATER_EQUALS,
+    IF_IS_LESS_EQUALS,
 }
 #[derive(Clone, Debug)]
 

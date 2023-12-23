@@ -338,70 +338,124 @@ pub fn interpretate(
                 && tokens[i + 1].get_type() == TokensTypes::L_PARENT
             {
                 // BUILD FUNCTIONS
-                if current_token.get_value() == "write_text" {
+                if current_token.get_value() == "print_text" {
                     if tokens[i + 2].get_type() != TokensTypes::STRING {
-                        err_txt = "invalid type in write_text function :(".to_string();
+                        err_txt = "invalid type in print_text function :(".to_string();
                     } else {
                         if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
-                            err_txt = "sintax error in write_text function".to_string();
+                            err_txt = "sintax error in print_text function".to_string();
                         } else {
                             print!("{}", tokens[i + 2].get_value());
                             i += 3;
                         }
                     }
                 }
-                if current_token.get_value() == "write_int" {
-                    if tokens[i + 2].get_type() != TokensTypes::INT {
-                        err_txt = "invalid type in write_int function :(".to_string();
-                    } else {
-                        if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
-                            err_txt = "sintax error in write_int function".to_string();
-                        } else {
-                            print!("{}", tokens[i + 2].get_value());
-                            i += 3;
-                        }
-                    }
-                }
-                if current_token.get_value() == "write_float" {
-                    if tokens[i + 2].get_type() != TokensTypes::FLOAT {
-                        err_txt = "invalid type in write_float function :(".to_string();
-                    } else {
-                        if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
-                            err_txt = "sintax error in write_float function".to_string();
-                        } else {
-                            print!("{}", tokens[i + 2].get_value());
-                            i += 3;
-                        }
-                    }
-                }
-                if current_token.get_value() == "writeln_text" {
+                if current_token.get_value() == "print_string" {
                     if tokens[i + 2].get_type() != TokensTypes::STRING {
-                        err_txt = "invalid type in writeln_text function :(".to_string();
+                        err_txt = "invalid type in print_string function :(".to_string();
                     } else {
                         if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
-                            err_txt = "sintax error in writeln_text function".to_string();
+                            err_txt = "sintax error in print_string function".to_string();
+                        } else {
+                            print!("{}", tokens[i + 2].get_value());
+                            i += 3;
+                        }
+                    }
+                }
+                if current_token.get_value() == "println_string" {
+                    if tokens[i + 2].get_type() != TokensTypes::STRING {
+                        err_txt = "invalid type in println_string function :(".to_string();
+                    } else {
+                        if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
+                            err_txt = "sintax error in println_string function".to_string();
                         } else {
                             println!("{}", tokens[i + 2].get_value());
                             i += 3;
                         }
                     }
-                } else if current_token.get_value() == "writeln_int" {
-                    if tokens[i + 2].get_type() != TokensTypes::INT {
-                        err_txt = "invalid type in writeln_int function :(".to_string();
+                }
+                if current_token.get_value() == "println" {
+                    if tokens[i + 2].get_type() != TokensTypes::STRING
+                        && tokens[i + 2].get_type() != TokensTypes::INT
+                        && tokens[i + 2].get_type() != TokensTypes::FLOAT
+                    {
+                        err_txt = "invalid type in println function :(".to_string();
                     } else {
                         if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
-                            err_txt = "sintax error in writeln_int function".to_string();
+                            err_txt = "sintax error in println function".to_string();
                         } else {
                             println!("{}", tokens[i + 2].get_value());
                             i += 3;
                         }
                     }
-                } else if current_token.get_value() == "writeln_float" {
-                    if tokens[i + 2].get_type() != TokensTypes::FLOAT {
-                        err_txt = "invalid type in writeln_float function :(".to_string();
+                }
+                if current_token.get_value() == "print" {
+                    if tokens[i + 2].get_type() != TokensTypes::STRING
+                        && tokens[i + 2].get_type() != TokensTypes::INT
+                        && tokens[i + 2].get_type() != TokensTypes::FLOAT
+                    {
+                        err_txt = "invalid type in print function :(".to_string();
                     } else {
                         if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
-                            err_txt = "sintax error in writeln_float function".to_string();
+                            err_txt = "sintax error in print function".to_string();
+                        } else {
+                            print!("{}", tokens[i + 2].get_value());
+                            i += 3;
+                        }
+                    }
+                }
+                if current_token.get_value() == "print_int" {
+                    if tokens[i + 2].get_type() != TokensTypes::INT {
+                        err_txt = "invalid type in print_int function :(".to_string();
+                    } else {
+                        if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
+                            err_txt = "sintax error in print_int function".to_string();
+                        } else {
+                            print!("{}", tokens[i + 2].get_value());
+                            i += 3;
+                        }
+                    }
+                }
+                if current_token.get_value() == "print_float" {
+                    if tokens[i + 2].get_type() != TokensTypes::FLOAT {
+                        err_txt = "invalid type in print_float function :(".to_string();
+                    } else {
+                        if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
+                            err_txt = "sintax error in print_float function".to_string();
+                        } else {
+                            print!("{}", tokens[i + 2].get_value());
+                            i += 3;
+                        }
+                    }
+                }
+                if current_token.get_value() == "println_text" {
+                    if tokens[i + 2].get_type() != TokensTypes::STRING {
+                        err_txt = "invalid type in println_text function :(".to_string();
+                    } else {
+                        if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
+                            err_txt = "sintax error in println_text function".to_string();
+                        } else {
+                            println!("{}", tokens[i + 2].get_value());
+                            i += 3;
+                        }
+                    }
+                } else if current_token.get_value() == "println_int" {
+                    if tokens[i + 2].get_type() != TokensTypes::INT {
+                        err_txt = "invalid type in println_int function :(".to_string();
+                    } else {
+                        if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
+                            err_txt = "sintax error in println_int function".to_string();
+                        } else {
+                            println!("{}", tokens[i + 2].get_value());
+                            i += 3;
+                        }
+                    }
+                } else if current_token.get_value() == "println_float" {
+                    if tokens[i + 2].get_type() != TokensTypes::FLOAT {
+                        err_txt = "invalid type in println_float function :(".to_string();
+                    } else {
+                        if tokens[i + 3].get_type() != TokensTypes::R_PARENT {
+                            err_txt = "sintax error in println_float function".to_string();
                         } else {
                             println!("{}", tokens[i + 2].get_value());
                             i += 3;
@@ -429,6 +483,7 @@ pub fn interpretate(
     if err_txt != "" {
         println!(" \nRUNTIME ERROR :(\n {}\n", err_txt);
     }
+    //println!("{:#?}", tokens);
 
     vars
 }

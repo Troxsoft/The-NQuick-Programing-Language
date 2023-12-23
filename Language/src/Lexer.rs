@@ -349,9 +349,9 @@ impl Lexer {
                 ));
                 i += 2;
             } else if tokens.len() > i + 2
-                && currentToken.get_type() == TokensTypes::TEXT
+                && currentToken.get_type() == TokensTypes::STRING
                 && tokens[i + 1].get_type() == TokensTypes::PLUS
-                && tokens[i + 2].get_type() == TokensTypes::TEXT
+                && tokens[i + 2].get_type() == TokensTypes::STRING
             {
                 err.push(LexerError::new(
                     "cannot be added with text".to_string(),
@@ -359,9 +359,9 @@ impl Lexer {
                 ));
                 i += 2;
             } else if tokens.len() > i + 2
-                && currentToken.get_type() == TokensTypes::TEXT
+                && currentToken.get_type() == TokensTypes::STRING
                 && tokens[i + 1].get_type() == TokensTypes::MINUS
-                && tokens[i + 2].get_type() == TokensTypes::TEXT
+                && tokens[i + 2].get_type() == TokensTypes::STRING
             {
                 err.push(LexerError::new(
                     "cannot be subtracted with text".to_string(),
@@ -369,9 +369,9 @@ impl Lexer {
                 ));
                 i += 2;
             } else if tokens.len() > i + 2
-                && currentToken.get_type() == TokensTypes::TEXT
+                && currentToken.get_type() == TokensTypes::STRING
                 && tokens[i + 1].get_type() == TokensTypes::MULT
-                && tokens[i + 2].get_type() == TokensTypes::TEXT
+                && tokens[i + 2].get_type() == TokensTypes::STRING
             {
                 err.push(LexerError::new(
                     "cannot be multiplied with text".to_string(),
@@ -379,9 +379,9 @@ impl Lexer {
                 ));
                 i += 2;
             } else if tokens.len() > i + 2
-                && currentToken.get_type() == TokensTypes::TEXT
+                && currentToken.get_type() == TokensTypes::STRING
                 && tokens[i + 1].get_type() == TokensTypes::DIV
-                && tokens[i + 2].get_type() == TokensTypes::TEXT
+                && tokens[i + 2].get_type() == TokensTypes::STRING
             {
                 err.push(LexerError::new(
                     "can't divid with text".to_string(),
@@ -560,6 +560,49 @@ impl Lexer {
                 tokens.push(Token::new(".".to_string(), TokensTypes::POINT));
             } else if self.get_current_char() == " " {
                 tokens.push(Token::new(" ".to_string(), TokensTypes::SPACE));
+            } else if self.get_current_char() == "<"
+                && self.position + 1 < self.text.len()
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 1)
+                    .unwrap()
+                    .to_string()
+                    == "="
+            {
+                tokens.push(Token::new("<=".to_string(), TokensTypes::IF_IS_LESS_EQUALS));
+                self.position += 1;
+            } else if self.get_current_char() == "="
+                && self.position + 1 < self.text.len()
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 1)
+                    .unwrap()
+                    .to_string()
+                    == "="
+            {
+                tokens.push(Token::new("==".to_string(), TokensTypes::IF_IS_EQUALS));
+                self.position += 1;
+            } else if self.get_current_char() == ">"
+                && self.position + 1 < self.text.len()
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 1)
+                    .unwrap()
+                    .to_string()
+                    == "="
+            {
+                tokens.push(Token::new(
+                    ">=".to_string(),
+                    TokensTypes::IF_IS_GREATER_EQUALS,
+                ));
+                self.position += 1;
+            } else if self.get_current_char() == "<" {
+                tokens.push(Token::new("<".to_string(), TokensTypes::IF_IS_LESS))
+            } else if self.get_current_char() == ">" {
+                tokens.push(Token::new(">".to_string(), TokensTypes::IF_IS_GREATER))
             } else if self.get_current_char() == "=" {
                 tokens.push(Token::new("=".to_string(), TokensTypes::EQUAL));
             } else if self.is_var_definition() && self.is_valid_new_text() {
@@ -571,6 +614,19 @@ impl Lexer {
                 tokens.push(self.create_numbers());
             } else if self.get_current_char() == ":" {
                 tokens.push(Token::new(":".to_string(), TokensTypes::TWO_POINTS));
+            } else if self.position + 1 < self.text.len()
+                && self.get_current_char() == "i"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 1)
+                    .unwrap()
+                    .to_string()
+                    == "f"
+                && self.is_valid_new_text()
+            {
+                tokens.push(Token::new("if".to_string(), TokensTypes::IF_CONDITION));
+                self.position += 1;
             } else if self.position + 2 < self.text.len()
                 && self.get_current_char() == "d"
                 && self
