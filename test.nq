@@ -1,6 +1,4 @@
-int
-float
-string
-def hola(){}
-let juan:string = "ano"
-print()
+writeln_int(2+2)
+writeln_float(4000.30 -300.2)
+writeln_int(2*2)
+writeln_int(2/2)

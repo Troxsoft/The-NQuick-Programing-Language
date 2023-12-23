@@ -26,7 +26,7 @@ fn main() {
             Token::new("1".to_string(), Language::Token::TokensTypes::INT_TYPE),
         );
         let mut varfff = interpretate(tokens2.clone(), vars);
-        println!("{:#?}", varfff);
+        // println!("{:#?}", varfff);
     }
 
     //println!("{}", code.clone());
