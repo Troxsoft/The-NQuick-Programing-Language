@@ -1,10 +1,11 @@
 let numero:float = 10.8
+println(2+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+22+2+2)
 println(numero -10.0)
 println(numero /1.0)
 numero = numero + numero
 let otro_numero:int = 30
 
-println (  otro_numero -0)
+println (  otro_numero)
 println(numero *2.0)
 
 let mensaje:string = "hola mundo"

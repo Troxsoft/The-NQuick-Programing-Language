@@ -1,7 +1,43 @@
-use std::{collections::HashMap, fs, process::Command};
+use std::{collections::HashMap, fs, process::Command, vec};
 
 use crate::Token::{Token, TokensTypes};
 // suma resta multiplicar division 1+1
+/**
+ * porfavor cuando se utilize esto no incluir el primer if
+ * ejemplo:
+ * if 3== 3
+ * ...
+ * end-if
+ * ->
+ * ...
+ *
+ * TODO: verificar si funciona o no hjrejhwhjhehjwhjhbhhhhhhhhhhhhhhhhhhhpppppppppppppppppppppppppppppppppppppppppppppppp
+ */
+pub fn get_if_tokens(tokens: Vec<Token>) -> Vec<Token> {
+    let mut new_tokens: Vec<Token> = Vec::new();
+    let mut i: usize = 0;
+    let mut others_if: usize = 0;
+    let mut others_if_ends: usize = 0;
+    let mut stop: bool = false;
+    while i < tokens.len() {
+        if stop == false {
+            if tokens[i].get_type() == TokensTypes::IF_CONDITION {
+                others_if += 1;
+            } else if tokens[i].get_type() == TokensTypes::END_IF {
+                if others_if != others_if_ends + 1 {
+                    stop = true;
+                } else {
+                    others_if_ends += 1;
+                }
+            }
+            if stop != true {
+                new_tokens.push(tokens[i].clone());
+            }
+            i += 1;
+        }
+    }
+    new_tokens
+}
 pub fn tranform_math_to_result(tokens_to_transform: Vec<Token>) -> Result<Token, String> {
     if tokens_to_transform.len() < 3 {
         return Err("invalid math".to_string());
@@ -185,6 +221,369 @@ pub fn is_math_operation(tokens: Vec<Token>) -> bool {
     }
     true
 }
+pub fn tranform_logic_comparation_to_result(tokens: Vec<Token>) -> Result<Token, String> {
+    /*d */
+    let mut true_or_false_number: u8 = 0;
+
+    // 1 = true 0 = false
+    if tokens.len() != 3 && tokens.len() != 4 && is_logic_comparation(tokens.clone()) == false {
+        return Err(String::from(
+            "is logic comparation(true,false) is invalid :/",
+        ));
+    }
+
+    if tokens.len() == 3 {
+        // string comparation ==
+        if tokens[0].get_type() == TokensTypes::STRING
+            && tokens[1].get_type() == TokensTypes::IF_IS_EQUALS
+            && tokens[2].get_type() == TokensTypes::STRING
+        {
+            if tokens[0].get_value() == tokens[2].get_value() {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        } else if tokens[0].get_type() == TokensTypes::INT
+            && tokens[1].get_type() == TokensTypes::IF_IS_EQUALS
+            && tokens[2].get_type() == TokensTypes::INT
+        {
+            if tokens[0].get_value().parse::<isize>().ok().unwrap()
+                == tokens[2].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        } else if tokens[0].get_type() == TokensTypes::FLOAT
+            && tokens[1].get_type() == TokensTypes::IF_IS_EQUALS
+            && tokens[2].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[0].get_value().parse::<f64>().ok().unwrap()
+                == tokens[2].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        }
+        // mayor >
+        else if tokens[0].get_type() == TokensTypes::INT
+            && tokens[1].get_type() == TokensTypes::IF_IS_GREATER
+            && tokens[2].get_type() == TokensTypes::INT
+        {
+            if tokens[0].get_value().parse::<isize>().ok().unwrap()
+                > tokens[2].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        } else if tokens[0].get_type() == TokensTypes::FLOAT
+            && tokens[1].get_type() == TokensTypes::IF_IS_GREATER
+            && tokens[2].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[0].get_value().parse::<f64>().ok().unwrap()
+                > tokens[2].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        }
+        // MENOR <
+        else if tokens[0].get_type() == TokensTypes::INT
+            && tokens[1].get_type() == TokensTypes::IF_IS_LESS
+            && tokens[2].get_type() == TokensTypes::INT
+        {
+            if tokens[0].get_value().parse::<isize>().ok().unwrap()
+                < tokens[2].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        } else if tokens[0].get_type() == TokensTypes::FLOAT
+            && tokens[1].get_type() == TokensTypes::IF_IS_LESS
+            && tokens[2].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[0].get_value().parse::<f64>().ok().unwrap()
+                < tokens[2].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        }
+        // mayor o igual
+        else if tokens[0].get_type() == TokensTypes::INT
+            && tokens[1].get_type() == TokensTypes::IF_IS_GREATER_EQUALS
+            && tokens[2].get_type() == TokensTypes::INT
+        {
+            if tokens[0].get_value().parse::<isize>().ok().unwrap()
+                >= tokens[2].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        } else if tokens[0].get_type() == TokensTypes::FLOAT
+            && tokens[1].get_type() == TokensTypes::IF_IS_GREATER_EQUALS
+            && tokens[2].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[0].get_value().parse::<f64>().ok().unwrap()
+                >= tokens[2].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        }
+        // menor o igual
+        else if tokens[0].get_type() == TokensTypes::INT
+            && tokens[1].get_type() == TokensTypes::IF_IS_LESS_EQUALS
+            && tokens[2].get_type() == TokensTypes::INT
+        {
+            if tokens[0].get_value().parse::<isize>().ok().unwrap()
+                <= tokens[2].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        } else if tokens[0].get_type() == TokensTypes::FLOAT
+            && tokens[1].get_type() == TokensTypes::IF_IS_LESS_EQUALS
+            && tokens[2].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[0].get_value().parse::<f64>().ok().unwrap()
+                <= tokens[2].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 1;
+            } else {
+                true_or_false_number = 0;
+            }
+        } else {
+            return Err(String::from(format!(
+                "is logic comparation(true,false) is invalid :/{:?}",
+                tokens
+            )));
+        }
+    }
+    //
+    else {
+        // string comparation ==
+        if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::STRING
+            && tokens[2].get_type() == TokensTypes::IF_IS_EQUALS
+            && tokens[3].get_type() == TokensTypes::STRING
+        {
+            if tokens[1].get_type() == TokensTypes::NOT
+                && tokens[3].get_value() == tokens[3].get_value()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        } else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::INT
+            && tokens[2].get_type() == TokensTypes::IF_IS_EQUALS
+            && tokens[3].get_type() == TokensTypes::INT
+        {
+            if tokens[1].get_value().parse::<isize>().ok().unwrap()
+                == tokens[3].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        } else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::FLOAT
+            && tokens[2].get_type() == TokensTypes::IF_IS_EQUALS
+            && tokens[3].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[1].get_value().parse::<f64>().ok().unwrap()
+                == tokens[3].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        }
+        // mayor >
+        else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::INT
+            && tokens[2].get_type() == TokensTypes::IF_IS_GREATER
+            && tokens[3].get_type() == TokensTypes::INT
+        {
+            if tokens[1].get_value().parse::<isize>().ok().unwrap()
+                > tokens[3].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        } else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::FLOAT
+            && tokens[2].get_type() == TokensTypes::IF_IS_GREATER
+            && tokens[3].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[1].get_value().parse::<f64>().ok().unwrap()
+                > tokens[3].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        }
+        // MENOR <
+        else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::INT
+            && tokens[2].get_type() == TokensTypes::IF_IS_LESS
+            && tokens[3].get_type() == TokensTypes::INT
+        {
+            if tokens[1].get_value().parse::<isize>().ok().unwrap()
+                < tokens[3].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        } else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::FLOAT
+            && tokens[2].get_type() == TokensTypes::IF_IS_LESS
+            && tokens[3].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[1].get_value().parse::<f64>().ok().unwrap()
+                < tokens[3].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        }
+        // mayor o igual
+        else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::INT
+            && tokens[2].get_type() == TokensTypes::IF_IS_GREATER_EQUALS
+            && tokens[3].get_type() == TokensTypes::INT
+        {
+            if tokens[1].get_value().parse::<isize>().ok().unwrap()
+                >= tokens[3].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        } else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::FLOAT
+            && tokens[2].get_type() == TokensTypes::IF_IS_GREATER_EQUALS
+            && tokens[3].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[1].get_value().parse::<f64>().ok().unwrap()
+                >= tokens[3].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        }
+        // menor o igual
+        else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::INT
+            && tokens[2].get_type() == TokensTypes::IF_IS_LESS_EQUALS
+            && tokens[3].get_type() == TokensTypes::INT
+        {
+            if tokens[1].get_value().parse::<isize>().ok().unwrap()
+                <= tokens[3].get_value().parse::<isize>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        } else if tokens[0].get_type() == TokensTypes::NOT
+            && tokens[1].get_type() == TokensTypes::FLOAT
+            && tokens[2].get_type() == TokensTypes::IF_IS_LESS_EQUALS
+            && tokens[3].get_type() == TokensTypes::FLOAT
+        {
+            if tokens[1].get_value().parse::<f64>().ok().unwrap()
+                <= tokens[3].get_value().parse::<f64>().ok().unwrap()
+            {
+                true_or_false_number = 0;
+            } else {
+                true_or_false_number = 1;
+            }
+        } else {
+            return Err(String::from(
+                "is logic comparation(true,false) is invalid :/",
+            ));
+        }
+    }
+
+    Ok(Token::new(
+        format!("{}", true_or_false_number),
+        TokensTypes::INT,
+    ))
+}
+pub fn is_logic_comparation(tokens: Vec<Token>) -> bool {
+    // igual equals
+    // if 2 == 2
+    //if not 2 == 2
+    if tokens.len() != 3 && tokens.len() != 4 {
+        return false;
+    }
+
+    // new
+
+    if tokens.len() == 3 {
+        if tokens[0].get_type() != TokensTypes::STRING
+            && tokens[0].get_type() != TokensTypes::INT
+            && tokens[0].get_type() != TokensTypes::FLOAT
+        {
+            return false;
+        }
+        if tokens[1].get_type() != TokensTypes::IF_IS_EQUALS
+            && tokens[1].get_type() != TokensTypes::IF_IS_GREATER
+            && tokens[1].get_type() != TokensTypes::IF_IS_GREATER_EQUALS
+            && tokens[1].get_type() != TokensTypes::IF_IS_LESS
+            && tokens[1].get_type() != TokensTypes::IF_IS_LESS_EQUALS
+        {
+            return false;
+        }
+        if tokens[2].get_type() != TokensTypes::STRING
+            && tokens[2].get_type() != TokensTypes::INT
+            && tokens[2].get_type() != TokensTypes::FLOAT
+        {
+            return false;
+        }
+    }
+
+    if tokens.len() == 4 {
+        if tokens[0].get_type() != TokensTypes::NOT {
+            return false;
+        }
+        if tokens[1].get_type() != TokensTypes::STRING
+            && tokens[1].get_type() != TokensTypes::INT
+            && tokens[1].get_type() != TokensTypes::FLOAT
+        {
+            return false;
+        }
+        if tokens[2].get_type() != TokensTypes::IF_IS_EQUALS
+            && tokens[2].get_type() != TokensTypes::IF_IS_GREATER
+            && tokens[2].get_type() != TokensTypes::IF_IS_GREATER_EQUALS
+            && tokens[2].get_type() != TokensTypes::IF_IS_LESS
+            && tokens[2].get_type() != TokensTypes::IF_IS_LESS_EQUALS
+        {
+            return false;
+        }
+        if tokens[3].get_type() != TokensTypes::STRING
+            && tokens[3].get_type() != TokensTypes::INT
+            && tokens[3].get_type() != TokensTypes::FLOAT
+        {
+            return false;
+        }
+    }
+
+    true
+}
 pub fn interpretate(
     mut tokens: Vec<Token>,
     mut vars: HashMap<String, Token>,
@@ -215,6 +614,7 @@ pub fn interpretate(
             if is_only_line {
                 let mut k: usize = i;
                 while k < tokens.len() {
+                    let mut putin: bool = false;
                     if k + 2 < tokens.len() {
                         let mut vec_t99: Vec<Token> = Vec::new();
                         vec_t99.push(tokens[k].clone());
@@ -228,10 +628,65 @@ pub fn interpretate(
                                 tokens[k] = h40.ok().unwrap();
                                 tokens[k + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
                                 tokens[k + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                putin = true;
+                                tokens = Token::ignore_space_tokens(tokens);
+                                current_token = tokens[i].clone();
                             }
                         }
                     }
-                    k += 1;
+                    if !putin {
+                        k += 1;
+                    }
+                }
+                let mut k51: usize = i;
+                //3 == 3
+                while k51 < tokens.len() {
+                    let mut putin: bool = false;
+                    if k51 + 2 < tokens.len() {
+                        let mut vec_t99: Vec<Token> = Vec::new();
+                        vec_t99.push(tokens[k51].clone());
+                        vec_t99.push(tokens[k51 + 1].clone());
+                        vec_t99.push(tokens[k51 + 2].clone());
+                        //println!("{}", is_logic_comparation(vec_t99.clone()));
+                        if is_logic_comparation(vec_t99.clone()) {
+                            let mut result3 = tranform_logic_comparation_to_result(vec_t99.clone());
+                            if result3.is_ok() {
+                                tokens[k51] = result3.ok().unwrap();
+                                tokens[k51 + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens[k51 + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens = Token::ignore_space_tokens(tokens);
+                                current_token = tokens[i].clone();
+                                putin = true;
+                            } else {
+                                err_txt = result3.err().unwrap();
+                            }
+                        }
+                    }
+                    if k51 + 3 < tokens.len() {
+                        let mut vec_t99: Vec<Token> = Vec::new();
+                        vec_t99.push(tokens[k51].clone());
+                        vec_t99.push(tokens[k51 + 1].clone());
+                        vec_t99.push(tokens[k51 + 2].clone());
+                        vec_t99.push(tokens[k51 + 3].clone());
+                        //println!("{}", is_logic_comparation(vec_t99.clone()));
+                        if is_logic_comparation(vec_t99.clone()) {
+                            let mut result3 = tranform_logic_comparation_to_result(vec_t99.clone());
+                            if result3.is_ok() {
+                                tokens[k51] = result3.ok().unwrap();
+                                tokens[k51 + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens[k51 + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens[k51 + 3] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens = Token::ignore_space_tokens(tokens);
+                                current_token = tokens[i].clone();
+                                putin = true;
+                            } else {
+                                err_txt = result3.err().unwrap();
+                            }
+                        }
+                    }
+                    if !putin {
+                        k51 += 1;
+                    }
                 }
             } else {
                 let mut k20: usize = i;
@@ -259,6 +714,7 @@ pub fn interpretate(
             let mut k: usize = i;
             while k.clone() < tokens.len() && tokens[k].get_type() != TokensTypes::END_LINE {
                 //println!("index k:{}", k);
+                let mut putin: bool = false;
                 if k + 1 >= tokens.len() {
                     break;
                 }
@@ -275,16 +731,69 @@ pub fn interpretate(
                             tokens[k] = h40.ok().unwrap();
                             tokens[k + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
                             tokens[k + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                            putin = true;
+                            tokens = Token::ignore_space_tokens(tokens);
+                            current_token = tokens[i].clone();
                         }
                     }
                 }
 
-                k += 1;
+                if !putin {
+                    k += 1;
+                }
             }
 
             tokens = Token::ignore_space_tokens(tokens);
             current_token = tokens[i].clone();
-
+            let mut k51: usize = i;
+            //3 == 3
+            while k51.clone() < tokens.len() && tokens[k51].get_type() != TokensTypes::END_LINE {
+                let mut putin: bool = false;
+                if k51 + 2 < tokens.len() {
+                    let mut vec_t99: Vec<Token> = Vec::new();
+                    vec_t99.push(tokens[k51].clone());
+                    vec_t99.push(tokens[k51 + 1].clone());
+                    vec_t99.push(tokens[k51 + 2].clone());
+                    if is_logic_comparation(vec_t99.clone()) {
+                        let mut result3 = tranform_logic_comparation_to_result(vec_t99.clone());
+                        if result3.is_ok() {
+                            tokens[k51] = result3.ok().unwrap();
+                            tokens[k51 + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                            tokens[k51 + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                            tokens = Token::ignore_space_tokens(tokens);
+                            current_token = tokens[i].clone();
+                            putin = true;
+                        } else {
+                            err_txt = result3.err().unwrap();
+                        }
+                    }
+                }
+                if k51 + 3 < tokens.len() {
+                    let mut vec_t99: Vec<Token> = Vec::new();
+                    vec_t99.push(tokens[k51].clone());
+                    vec_t99.push(tokens[k51 + 1].clone());
+                    vec_t99.push(tokens[k51 + 2].clone());
+                    vec_t99.push(tokens[k51 + 3].clone());
+                    //println!("{}", is_logic_comparation(vec_t99.clone()));
+                    if is_logic_comparation(vec_t99.clone()) {
+                        let mut result3 = tranform_logic_comparation_to_result(vec_t99.clone());
+                        if result3.is_ok() {
+                            tokens[k51] = result3.ok().unwrap();
+                            tokens[k51 + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                            tokens[k51 + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                            tokens[k51 + 3] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                            tokens = Token::ignore_space_tokens(tokens);
+                            current_token = tokens[i].clone();
+                            putin = true;
+                        } else {
+                            err_txt = result3.err().unwrap();
+                        }
+                    }
+                }
+                if !putin {
+                    k51 += 1;
+                }
+            }
             tokens = Token::ignore_space_tokens(tokens);
             current_token = tokens[i].clone();
             // println!(
@@ -310,6 +819,7 @@ pub fn interpretate(
             }
             tokens = Token::ignore_space_tokens(tokens);
             current_token = tokens[i].clone();
+
             // BUILD FUNCTIONS AND MORE
 
             if current_token.get_type() == TokensTypes::TEXT

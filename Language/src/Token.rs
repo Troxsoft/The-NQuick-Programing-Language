@@ -21,8 +21,7 @@ pub enum TokensTypes {
     QUOTE, //comillas
     STRING,
     STRING_TYPE,
-    BRACKET_START,
-    BRACKET_END,
+
     FUNCTION,
     COMMA,
     RETURN_SYMBOL,
@@ -32,6 +31,8 @@ pub enum TokensTypes {
     IF_IS_LESS,
     IF_IS_GREATER_EQUALS,
     IF_IS_LESS_EQUALS,
+    END_IF,
+    NOT,
 }
 #[derive(Clone, Debug)]
 

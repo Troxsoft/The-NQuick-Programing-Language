@@ -388,12 +388,17 @@ impl Lexer {
                     format!("{}/{}", currentToken.get_value(), tokens[i + 2].get_value()),
                 ));
                 i += 2;
+            } else if currentToken.get_type() == TokensTypes::IF_CONDITION && i + 3 < tokens.len() {
+                err.push(LexerError::new(
+                    "error in if declaration".to_string(),
+                    format!("{} :(", currentToken.get_value()),
+                ));
             } else if currentToken.get_type() == TokensTypes::LET_VAR && i + 5 >= tokens.len() {
                 err.push(LexerError::new(
                     "error in variable declaration. [let example:int = 4]".to_string(),
                     format!("{} :(", currentToken.get_value()),
                 ));
-            } else if currentToken.get_type() == TokensTypes::FUNCTION && i + 5 >= tokens.len() {
+            } else if currentToken.get_type() == TokensTypes::FUNCTION && i + 5 < tokens.len() {
                 err.push(LexerError::new(
                     "error in function declaration.".to_string(),
                     format!("{} :(", currentToken.get_value()),
@@ -468,6 +473,23 @@ impl Lexer {
             }
             i += 1;
         }
+        let mut numIf: usize = 0;
+        let mut numIfEnds: usize = 0;
+        let mut klo: usize = 0;
+        while klo.clone() < tokens.len() {
+            if tokens[klo].get_type() == TokensTypes::IF_CONDITION {
+                numIf += 1;
+            } else if tokens[klo].get_type() == TokensTypes::END_IF {
+                numIfEnds += 1;
+            }
+            klo += 1;
+        }
+        if numIf != numIfEnds {
+            err.push(LexerError::new(
+                "all if lenght != all end-if lenght".to_string(),
+                "if".to_string(),
+            ));
+        }
         err
     }
     pub fn is_valid_new_text(&mut self) -> bool {
@@ -489,6 +511,8 @@ impl Lexer {
                 || last_text == " "
                 || last_text == ""
                 || last_text == "\n"
+                || last_text == "("
+                || last_text == ")"
             {
                 valid = true;
             } else {
@@ -542,10 +566,6 @@ impl Lexer {
                 }
             } else if self.get_current_char() == "-" {
                 tokens.push(Token::new("-".to_string(), TokensTypes::MINUS));
-            } else if self.get_current_char() == "{" {
-                tokens.push(Token::new("{".to_string(), TokensTypes::BRACKET_START));
-            } else if self.get_current_char() == "}" {
-                tokens.push(Token::new("}".to_string(), TokensTypes::BRACKET_END));
             } else if self.get_current_char() == "\n" {
                 tokens.push(Token::new("\n".to_string(), TokensTypes::END_LINE));
             } else if self.get_current_char() == "*" {
@@ -627,25 +647,86 @@ impl Lexer {
             {
                 tokens.push(Token::new("if".to_string(), TokensTypes::IF_CONDITION));
                 self.position += 1;
-            } else if self.position + 2 < self.text.len()
-                && self.get_current_char() == "d"
+            } else if self.position + 5 < self.text.len()
+                && self.get_current_char() == "e"
                 && self
                     .text
                     .chars()
                     .nth(self.position + 1)
                     .unwrap()
                     .to_string()
-                    == "e"
+                    == "n"
                 && self
                     .text
                     .chars()
                     .nth(self.position + 2)
                     .unwrap()
                     .to_string()
+                    == "d"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 3)
+                    .unwrap()
+                    .to_string()
+                    == "-"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 4)
+                    .unwrap()
+                    .to_string()
+                    == "i"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 5)
+                    .unwrap()
+                    .to_string()
                     == "f"
                 && self.is_valid_new_text()
             {
-                tokens.push(Token::new("def".to_string(), TokensTypes::FUNCTION));
+                tokens.push(Token::new("end-if".to_string(), TokensTypes::END_IF));
+                self.position += 5;
+            } else if self.position + 2 < self.text.len()
+                && self.get_current_char() == "f"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 1)
+                    .unwrap()
+                    .to_string()
+                    == "u"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 2)
+                    .unwrap()
+                    .to_string()
+                    == "n"
+                && self.is_valid_new_text()
+            {
+                tokens.push(Token::new("fun".to_string(), TokensTypes::FUNCTION));
+                self.position += 2;
+            } else if self.position + 2 < self.text.len()
+                && self.get_current_char() == "n"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 1)
+                    .unwrap()
+                    .to_string()
+                    == "o"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 2)
+                    .unwrap()
+                    .to_string()
+                    == "t"
+                && self.is_valid_new_text()
+            {
+                tokens.push(Token::new("not".to_string(), TokensTypes::NOT));
                 self.position += 2;
             } else if self.position + 2 < self.text.len()
                 && self.get_current_char() == "i"
