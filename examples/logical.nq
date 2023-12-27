@@ -1,0 +1,7 @@
+println(3<9)
+println(3>9)
+println(3==3)
+println(3<=3)
+println("hola"=="hola")
+println(not 3==3)
+println(100>=101)
