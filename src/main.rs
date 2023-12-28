@@ -74,11 +74,11 @@ fn main() {
                 let mut vars: HashMap<String, Token> = HashMap::new();
                 vars.insert(
                     "true".to_string(),
-                    Token::new("1".to_string(), Language::Token::TokensTypes::INT_TYPE),
+                    Token::new("1".to_string(), Language::Token::TokensTypes::INT),
                 );
                 vars.insert(
                     "false".to_string(),
-                    Token::new("0".to_string(), Language::Token::TokensTypes::INT_TYPE),
+                    Token::new("0".to_string(), Language::Token::TokensTypes::INT),
                 );
                 // println!("{:?}", interpretate(tokens2.clone(), vars));
                 interpretate(tokens2.clone(), vars);

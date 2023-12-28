@@ -388,7 +388,8 @@ impl Lexer {
                     format!("{}/{}", currentToken.get_value(), tokens[i + 2].get_value()),
                 ));
                 i += 2;
-            } else if currentToken.get_type() == TokensTypes::IF_CONDITION && i + 3 < tokens.len() {
+            } else if currentToken.get_type() == TokensTypes::IF_CONDITION && i + 3 >= tokens.len()
+            {
                 err.push(LexerError::new(
                     "error in if declaration".to_string(),
                     format!("{} :(", currentToken.get_value()),
@@ -490,8 +491,28 @@ impl Lexer {
                 "if".to_string(),
             ));
         }
+
+        let mut numWhile: usize = 0;
+        let mut numWhileEnds: usize = 0;
+        let mut klo: usize = 0;
+        while klo.clone() < tokens.len() {
+            if tokens[klo].get_type() == TokensTypes::WHILE_LOOP {
+                numWhile += 1;
+            } else if tokens[klo].get_type() == TokensTypes::END_WHILE_LOOP {
+                numWhileEnds += 1;
+            }
+            klo += 1;
+        }
+        if numWhile != numWhileEnds {
+            err.push(LexerError::new(
+                "all while lenght != all end-while lenght".to_string(),
+                "while".to_string(),
+            ));
+        }
+
         err
     }
+
     pub fn is_valid_new_text(&mut self) -> bool {
         let mut last_text: String = "".to_string();
         let mut valid: bool = true;
@@ -829,6 +850,105 @@ impl Lexer {
                     TokensTypes::FLOAT_TYPE,
                 ));
                 self.position += 4;
+            } else if self.position + 4 < self.text.len()
+                && self.get_current_char() == "w"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 1)
+                    .unwrap()
+                    .to_string()
+                    == "h"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 2)
+                    .unwrap()
+                    .to_string()
+                    == "i"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 3)
+                    .unwrap()
+                    .to_string()
+                    == "l"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 4)
+                    .unwrap()
+                    .to_string()
+                    == "e"
+                && self.is_valid_new_text()
+            {
+                tokens.push(Token::new("while".to_string(), TokensTypes::WHILE_LOOP));
+                self.position += 4;
+            } else if self.position + 8 < self.text.len()
+                && self.get_current_char() == "e"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 1)
+                    .unwrap()
+                    .to_string()
+                    == "n"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 2)
+                    .unwrap()
+                    .to_string()
+                    == "d"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 3)
+                    .unwrap()
+                    .to_string()
+                    == "-"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 4)
+                    .unwrap()
+                    .to_string()
+                    == "w"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 5)
+                    .unwrap()
+                    .to_string()
+                    == "h"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 6)
+                    .unwrap()
+                    .to_string()
+                    == "i"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 7)
+                    .unwrap()
+                    .to_string()
+                    == "l"
+                && self
+                    .text
+                    .chars()
+                    .nth(self.position + 8)
+                    .unwrap()
+                    .to_string()
+                    == "e"
+                && self.is_valid_new_text()
+            {
+                tokens.push(Token::new(
+                    "end-while".to_string(),
+                    TokensTypes::END_WHILE_LOOP,
+                ));
+                self.position += 8;
             } else {
                 tokens.push(Token::new(self.get_current_char(), TokensTypes::TEXT));
             }

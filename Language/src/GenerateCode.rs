@@ -13,7 +13,35 @@ use crate::Token::{Token, TokensTypes};
  *
  * TODO: verificar si funciona o no hjrejhwhjhehjwhjhbhhhhhhhhhhhhhhhhhhhpppppppppppppppppppppppppppppppppppppppppppppppp
  */
-pub fn get_if_tokens(tokens: Vec<Token>) -> Vec<Token> {
+pub fn get_while_tokens(tokens: Vec<Token>) -> (Vec<Token>, usize) {
+    let mut new_tokens: Vec<Token> = Vec::new();
+    let mut i: usize = 0;
+    let mut others_if: usize = 0;
+    let mut others_if_ends: usize = 0;
+    let mut stop: bool = false;
+    while i < tokens.len() {
+        if stop == false {
+            if tokens[i].get_type() == TokensTypes::WHILE_LOOP {
+                others_if += 1;
+            } else if tokens[i].get_type() == TokensTypes::END_WHILE_LOOP {
+                if others_if != others_if_ends + 1 {
+                    stop = true;
+                } else {
+                    others_if_ends += 1;
+                }
+            }
+            if stop != true {
+                new_tokens.push(tokens[i].clone());
+            } else {
+                break;
+            }
+            i += 1;
+        }
+    }
+    //println!("\n{:?}\n", new_tokens);
+    (new_tokens, i + 1)
+}
+pub fn get_if_tokens(tokens: Vec<Token>) -> (Vec<Token>, usize) {
     let mut new_tokens: Vec<Token> = Vec::new();
     let mut i: usize = 0;
     let mut others_if: usize = 0;
@@ -32,11 +60,14 @@ pub fn get_if_tokens(tokens: Vec<Token>) -> Vec<Token> {
             }
             if stop != true {
                 new_tokens.push(tokens[i].clone());
+            } else {
+                break;
             }
             i += 1;
         }
     }
-    new_tokens
+    //println!("\n{:?}\n", new_tokens);
+    (new_tokens, i + 1)
 }
 pub fn tranform_math_to_result(tokens_to_transform: Vec<Token>) -> Result<Token, String> {
     if tokens_to_transform.len() < 3 {
@@ -584,12 +615,33 @@ pub fn is_logic_comparation(tokens: Vec<Token>) -> bool {
 
     true
 }
+pub fn get_end_line_index_last(i: usize, tokens: Vec<Token>) -> usize {
+    let mut i3d: usize = i;
+    if i3d == 0 {
+        return i;
+    }
+    while tokens[i3d].get_type() != TokensTypes::END_LINE {
+        i3d -= 1;
+    }
+    i3d
+}
+pub fn get_end_line_index_next(i: usize, tokens: Vec<Token>) -> usize {
+    let mut i3d: usize = i;
+    if i3d == tokens.len() - 1 {
+        return i;
+    }
+    while tokens[i3d].get_type() != TokensTypes::END_LINE {
+        i3d += 1;
+    }
+    i3d
+}
 pub fn interpretate(
     mut tokens: Vec<Token>,
     mut vars: HashMap<String, Token>,
 ) -> HashMap<String, Token> {
     tokens = Token::ignore_space_tokens(tokens);
     //let mut rust_code: String = "".to_string();
+    //println!("\n{:?}", tokens.clone());
     let mut i: usize = 0;
     let mut err_txt: String = "".to_string();
     let mut is_only_line: bool = true;
@@ -689,6 +741,12 @@ pub fn interpretate(
                     }
                 }
             } else {
+            }
+            tokens = Token::ignore_space_tokens(tokens);
+            current_token = tokens[i].clone();
+            if tokens[get_end_line_index_last(i.clone(), tokens.clone()) + 1].get_type()
+                != TokensTypes::WHILE_LOOP
+            {
                 let mut k20: usize = i;
                 while k20.clone() < tokens.len() && tokens[k20].get_type() != TokensTypes::END_LINE
                 {
@@ -708,115 +766,115 @@ pub fn interpretate(
 
                     k20 += 1;
                 }
-            }
-            tokens = Token::ignore_space_tokens(tokens);
-            current_token = tokens[i].clone();
-            let mut k: usize = i;
-            while k.clone() < tokens.len() && tokens[k].get_type() != TokensTypes::END_LINE {
-                //println!("index k:{}", k);
-                let mut putin: bool = false;
-                if k + 1 >= tokens.len() {
-                    break;
+                let mut k: usize = i;
+                while k.clone() < tokens.len() && tokens[k].get_type() != TokensTypes::END_LINE {
+                    //println!("index k:{}", k);
+                    let mut putin: bool = false;
+                    if k + 1 >= tokens.len() {
+                        break;
+                    }
+                    if k + 2 < tokens.len() {
+                        let mut vec_t99: Vec<Token> = Vec::new();
+                        vec_t99.push(tokens[k].clone());
+                        vec_t99.push(tokens[k + 1].clone());
+                        vec_t99.push(tokens[k + 2].clone());
+                        if is_math_operation(vec_t99.clone()) {
+                            let mut h40: Result<Token, String> = tranform_math_to_result(vec_t99);
+                            if (h40.is_err()) {
+                                err_txt = h40.err().unwrap();
+                            } else {
+                                tokens[k] = h40.ok().unwrap();
+                                tokens[k + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens[k + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                putin = true;
+                                tokens = Token::ignore_space_tokens(tokens);
+                                current_token = tokens[i].clone();
+                            }
+                        }
+                    }
+
+                    if !putin {
+                        k += 1;
+                    }
                 }
-                if k + 2 < tokens.len() {
+
+                tokens = Token::ignore_space_tokens(tokens);
+                current_token = tokens[i].clone();
+                let mut k51: usize = i;
+                //3 == 3
+                while k51.clone() < tokens.len() && tokens[k51].get_type() != TokensTypes::END_LINE
+                {
+                    let mut putin: bool = false;
+                    if k51 + 2 < tokens.len() {
+                        let mut vec_t99: Vec<Token> = Vec::new();
+                        vec_t99.push(tokens[k51].clone());
+                        vec_t99.push(tokens[k51 + 1].clone());
+                        vec_t99.push(tokens[k51 + 2].clone());
+                        if is_logic_comparation(vec_t99.clone()) {
+                            let mut result3 = tranform_logic_comparation_to_result(vec_t99.clone());
+                            if result3.is_ok() {
+                                tokens[k51] = result3.ok().unwrap();
+                                tokens[k51 + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens[k51 + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens = Token::ignore_space_tokens(tokens);
+                                current_token = tokens[i].clone();
+                                putin = true;
+                            } else {
+                                err_txt = result3.err().unwrap();
+                            }
+                        }
+                    }
+                    if k51 + 3 < tokens.len() {
+                        let mut vec_t99: Vec<Token> = Vec::new();
+                        vec_t99.push(tokens[k51].clone());
+                        vec_t99.push(tokens[k51 + 1].clone());
+                        vec_t99.push(tokens[k51 + 2].clone());
+                        vec_t99.push(tokens[k51 + 3].clone());
+                        //println!("{}", is_logic_comparation(vec_t99.clone()));
+                        if is_logic_comparation(vec_t99.clone()) {
+                            let mut result3 = tranform_logic_comparation_to_result(vec_t99.clone());
+                            if result3.is_ok() {
+                                tokens[k51] = result3.ok().unwrap();
+                                tokens[k51 + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens[k51 + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens[k51 + 3] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                                tokens = Token::ignore_space_tokens(tokens);
+                                current_token = tokens[i].clone();
+                                putin = true;
+                            } else {
+                                err_txt = result3.err().unwrap();
+                            }
+                        }
+                    }
+                    if !putin {
+                        k51 += 1;
+                    }
+                }
+                tokens = Token::ignore_space_tokens(tokens);
+                current_token = tokens[i].clone();
+                // println!(
+                //     "TOKENS IMPORTANTES AAAAAAAAAAAAAAAREVISAR :B \n{:#?} \nYA TETETTETETTETE",
+                //     tokens.clone()
+                // );
+                if i + 2 < tokens.len() {
                     let mut vec_t99: Vec<Token> = Vec::new();
-                    vec_t99.push(tokens[k].clone());
-                    vec_t99.push(tokens[k + 1].clone());
-                    vec_t99.push(tokens[k + 2].clone());
+                    vec_t99.push(tokens[i].clone());
+                    vec_t99.push(tokens[i + 1].clone());
+                    vec_t99.push(tokens[i + 2].clone());
+
                     if is_math_operation(vec_t99.clone()) {
                         let mut h40: Result<Token, String> = tranform_math_to_result(vec_t99);
                         if (h40.is_err()) {
                             err_txt = h40.err().unwrap();
                         } else {
-                            tokens[k] = h40.ok().unwrap();
-                            tokens[k + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                            tokens[k + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                            putin = true;
-                            tokens = Token::ignore_space_tokens(tokens);
-                            current_token = tokens[i].clone();
+                            tokens[i] = h40.ok().unwrap();
+                            tokens[i + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
+                            tokens[i + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
                         }
                     }
                 }
-
-                if !putin {
-                    k += 1;
-                }
             }
 
-            tokens = Token::ignore_space_tokens(tokens);
-            current_token = tokens[i].clone();
-            let mut k51: usize = i;
-            //3 == 3
-            while k51.clone() < tokens.len() && tokens[k51].get_type() != TokensTypes::END_LINE {
-                let mut putin: bool = false;
-                if k51 + 2 < tokens.len() {
-                    let mut vec_t99: Vec<Token> = Vec::new();
-                    vec_t99.push(tokens[k51].clone());
-                    vec_t99.push(tokens[k51 + 1].clone());
-                    vec_t99.push(tokens[k51 + 2].clone());
-                    if is_logic_comparation(vec_t99.clone()) {
-                        let mut result3 = tranform_logic_comparation_to_result(vec_t99.clone());
-                        if result3.is_ok() {
-                            tokens[k51] = result3.ok().unwrap();
-                            tokens[k51 + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                            tokens[k51 + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                            tokens = Token::ignore_space_tokens(tokens);
-                            current_token = tokens[i].clone();
-                            putin = true;
-                        } else {
-                            err_txt = result3.err().unwrap();
-                        }
-                    }
-                }
-                if k51 + 3 < tokens.len() {
-                    let mut vec_t99: Vec<Token> = Vec::new();
-                    vec_t99.push(tokens[k51].clone());
-                    vec_t99.push(tokens[k51 + 1].clone());
-                    vec_t99.push(tokens[k51 + 2].clone());
-                    vec_t99.push(tokens[k51 + 3].clone());
-                    //println!("{}", is_logic_comparation(vec_t99.clone()));
-                    if is_logic_comparation(vec_t99.clone()) {
-                        let mut result3 = tranform_logic_comparation_to_result(vec_t99.clone());
-                        if result3.is_ok() {
-                            tokens[k51] = result3.ok().unwrap();
-                            tokens[k51 + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                            tokens[k51 + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                            tokens[k51 + 3] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                            tokens = Token::ignore_space_tokens(tokens);
-                            current_token = tokens[i].clone();
-                            putin = true;
-                        } else {
-                            err_txt = result3.err().unwrap();
-                        }
-                    }
-                }
-                if !putin {
-                    k51 += 1;
-                }
-            }
-            tokens = Token::ignore_space_tokens(tokens);
-            current_token = tokens[i].clone();
-            // println!(
-            //     "TOKENS IMPORTANTES AAAAAAAAAAAAAAAREVISAR :B \n{:#?} \nYA TETETTETETTETE",
-            //     tokens.clone()
-            // );
-            if i + 2 < tokens.len() {
-                let mut vec_t99: Vec<Token> = Vec::new();
-                vec_t99.push(tokens[i].clone());
-                vec_t99.push(tokens[i + 1].clone());
-                vec_t99.push(tokens[i + 2].clone());
-
-                if is_math_operation(vec_t99.clone()) {
-                    let mut h40: Result<Token, String> = tranform_math_to_result(vec_t99);
-                    if (h40.is_err()) {
-                        err_txt = h40.err().unwrap();
-                    } else {
-                        tokens[i] = h40.ok().unwrap();
-                        tokens[i + 1] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                        tokens[i + 2] = Token::new(" ".to_string(), TokensTypes::SPACE);
-                    }
-                }
-            }
             tokens = Token::ignore_space_tokens(tokens);
             current_token = tokens[i].clone();
 
@@ -979,8 +1037,85 @@ pub fn interpretate(
                     vars.insert(tokens[i + 1].get_value(), tokens[i + 5].clone());
                 }
                 i += 5;
+            } else if current_token.get_type() == TokensTypes::WHILE_LOOP {
+                let mut index_final: usize = get_end_line_index_next(i, tokens.clone());
+                let mut index_init: usize = i + 1;
+                let mut tokens_condition_while: Vec<Token> =
+                    tokens[index_init.clone()..index_final.clone()].to_vec();
+                tokens_condition_while = Token::push_init(
+                    tokens_condition_while,
+                    Token::new("if".to_string(), TokensTypes::IF_CONDITION),
+                );
+                tokens_condition_while.push(Token::new("\n".to_string(), TokensTypes::END_LINE));
+                tokens_condition_while.push(Token::new("\n".to_string(), TokensTypes::END_LINE));
+
+                tokens_condition_while.push(Token::new(
+                    "__WHILE__LOOP__CONDITION__ONeO".to_string(),
+                    TokensTypes::TEXT,
+                ));
+
+                tokens_condition_while.push(Token::new("=".to_string(), TokensTypes::EQUAL));
+                tokens_condition_while.push(Token::new("1".to_string(), TokensTypes::INT));
+                tokens_condition_while.push(Token::new("\n".to_string(), TokensTypes::END_LINE));
+
+                tokens_condition_while.push(Token::new("end-if".to_string(), TokensTypes::END_IF));
+                tokens_condition_while.push(Token::new("\n".to_string(), TokensTypes::END_LINE));
+
+                //preprossing line
+
+                let mut new_vars_falses = vars.clone();
+                new_vars_falses.insert(
+                    "__WHILE__LOOP__CONDITION__ONeO".to_string(),
+                    Token::new("0".to_string(), TokensTypes::INT),
+                );
+                let mut tokens_while_loooooop: Vec<Token> =
+                    tokens.clone()[get_end_line_index_next(i, tokens.clone())..].to_vec();
+                // println!(
+                //     "{:?}",
+                //     tokens[get_end_line_index_last(i, tokens.ctlone()) + 1]
+                // );
+                //println!("{:#?}", tokens_while_loooooop.clone());
+                //println!("{:#?}", tokens.clone());
+                while interpretate(tokens_condition_while.clone(), new_vars_falses.clone())
+                    .get("__WHILE__LOOP__CONDITION__ONeO")
+                    .unwrap()
+                    .get_value()
+                    == "1"
+                {
+                    vars = interpretate(
+                        get_while_tokens(tokens_while_loooooop.clone()).0,
+                        vars.clone(),
+                    );
+                    new_vars_falses = vars.clone();
+                    new_vars_falses.insert(
+                        "__WHILE__LOOP__CONDITION__ONeO".to_string(),
+                        Token::new("0".to_string(), TokensTypes::INT),
+                    );
+                }
+                i += get_while_tokens(tokens_while_loooooop.clone()).1 + 3;
+                //println!("{:?}", tokens[i].clone())
+            } else if current_token.get_type() == TokensTypes::IF_CONDITION
+                && i + 1 < tokens.len()
+                && tokens[i + 1].get_type() == TokensTypes::INT
+            {
+                if tokens[i + 1].get_value() == "1" {
+                    let mut tokens_to_remove_if: Vec<Token> = tokens[i..].to_vec();
+                    tokens_to_remove_if.remove(0);
+                    tokens_to_remove_if.remove(0);
+                    let mut tokens__if__ = get_if_tokens(tokens_to_remove_if.clone());
+                    vars = interpretate(tokens__if__.0, vars.clone());
+                    i += tokens__if__.1 + 1;
+                    //println!("{:?}", tokens[i]);
+                } else {
+                    let mut tokens_to_remove_if: Vec<Token> = tokens[i..].to_vec();
+                    tokens_to_remove_if.remove(0);
+                    tokens_to_remove_if.remove(0);
+                    let mut tokens__if__ = get_if_tokens(tokens_to_remove_if.clone());
+                    i += tokens__if__.1 + 1;
+                    //println!("{:?}", tokens[i]);
+                }
             } else {
-                err_txt = "error in function".to_string();
+                err_txt = format!("error in token: '{:?}' in token position: {}", tokens[i], i);
             }
         }
 
@@ -993,7 +1128,7 @@ pub fn interpretate(
     if err_txt != "" {
         println!(" \nRUNTIME ERROR :(\n {}\n", err_txt);
     }
-    //println!("{:#?}", tokens);
-
+    //println!("\n{:#?}\n", tokens);
+    // println!("{:?}", vars);
     vars
 }

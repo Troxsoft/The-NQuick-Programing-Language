@@ -29,9 +29,12 @@ pub enum TokensTypes {
     IF_CONDITION,
     IF_IS_GREATER,
     IF_IS_LESS,
+
     IF_IS_GREATER_EQUALS,
     IF_IS_LESS_EQUALS,
     END_IF,
+    WHILE_LOOP,
+    END_WHILE_LOOP,
     NOT,
 }
 #[derive(Clone, Debug)]
@@ -54,6 +57,12 @@ impl Token {
     }
     pub fn get_value(&self) -> String {
         return self.value.clone();
+    }
+    pub fn push_init(mut tokens: Vec<Token>, element: Token) -> Vec<Token> {
+        let mut lis: Vec<Token> = Vec::new();
+        lis.push(element);
+        lis.append(&mut tokens);
+        lis
     }
     pub fn ignore_space_tokens(tokens: Vec<Token>) -> Vec<Token> {
         let mut n_t: Vec<Token> = Vec::new();

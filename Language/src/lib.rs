@@ -2,6 +2,7 @@ pub mod GenerateCode;
 pub mod Lexer;
 pub mod LexerError;
 pub mod Token;
+
 pub fn format_and_clean_code(code: String) -> String {
     let mut i: usize = 0;
     let lines = code.split("\n");
