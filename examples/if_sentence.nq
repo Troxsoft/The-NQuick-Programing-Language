@@ -1,0 +1,15 @@
+if "hola" == "hola"
+    println("nooooooo 2")
+end-if
+println("nooooooo 1") 
+
+
+
+println("nooooooo 3")
+if "1" == "1"
+    println("ano")
+end-if 
+let numero:int = 30
+if 0 == true
+    println("correcto")
+end-if

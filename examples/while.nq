@@ -1,0 +1,11 @@
+let i:int = 0
+while i < 10000
+    if i == 9999
+        println("te pille")
+    end-if
+    if not i == 9999
+
+        println(i)
+    end-if
+    i = i+1
+end-while
