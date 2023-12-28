@@ -1,0 +1,4 @@
+let num_1:int = 1+1
+println(num_1)
+let num_2:int = 1*num_1*3
+println(num_2)
