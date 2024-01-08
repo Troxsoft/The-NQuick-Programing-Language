@@ -1,13 +1,8 @@
-def hola_mundo(){
-    write_text("hola mundo")
-}
-def suma(a:int,b:int){
-    write_int(a+b)
-}
-def ano()->int{
-    return 2
-}
-def start(){
-    hola_mundo()
-    suma(30,30)
-}
+fun hola()
+    println("hola canal")
+end-fun
+fun hola2(str:string)
+    println("hola canal")
+end-fun
+hola()
+hola2("an")

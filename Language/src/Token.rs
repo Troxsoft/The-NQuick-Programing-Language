@@ -36,6 +36,7 @@ pub enum TokensTypes {
     WHILE_LOOP,
     END_WHILE_LOOP,
     NOT,
+    COMENT, // comentario
 }
 #[derive(Clone, Debug)]
 
@@ -68,7 +69,9 @@ impl Token {
         let mut n_t: Vec<Token> = Vec::new();
         let mut i: usize = 0;
         while i < tokens.len() {
-            if tokens[i].get_type() != TokensTypes::SPACE {
+            if tokens[i].get_type() != TokensTypes::SPACE
+                && tokens[i].get_type() != TokensTypes::COMENT
+            {
                 n_t.push(tokens[i].clone());
             }
             i += 1;

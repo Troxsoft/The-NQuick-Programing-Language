@@ -42,7 +42,25 @@ impl Lexer {
             true
         }
     }
+
     pub fn is_number_current_char(&mut self) -> bool {
+        if self.position - 1 > 0 && self.position - 1 < self.text.len() {
+            if self.get_current_char() == "0"
+                || self.get_current_char() == "1"
+                || self.get_current_char() == "2"
+                || self.get_current_char() == "3"
+                || self.get_current_char() == "4"
+                || self.get_current_char() == "5"
+                || self.get_current_char() == "6"
+                || self.get_current_char() == "7"
+                || self.get_current_char() == "8"
+                || self.get_current_char() == "9"
+            {
+                return true;
+            } else {
+                return false;
+            }
+        }
         if self.get_current_char() == "0"
             || self.get_current_char() == "1"
             || self.get_current_char() == "2"
@@ -589,6 +607,21 @@ impl Lexer {
                 tokens.push(Token::new("-".to_string(), TokensTypes::MINUS));
             } else if self.get_current_char() == "\n" {
                 tokens.push(Token::new("\n".to_string(), TokensTypes::END_LINE));
+            } else if self.get_current_char() == "#" {
+                let mut coments_string_index: usize = self.position;
+                while coments_string_index < self.text.len()
+                    && self
+                        .text
+                        .chars()
+                        .nth(coments_string_index)
+                        .unwrap()
+                        .to_string()
+                        != "\n"
+                {
+                    coments_string_index += 1;
+                }
+                self.position = coments_string_index;
+                tokens.push(Token::new("#".to_string(), TokensTypes::COMENT));
             } else if self.get_current_char() == "*" {
                 tokens.push(Token::new("*".to_string(), TokensTypes::MULT));
             } else if self.get_current_char() == "/" {
@@ -651,8 +684,15 @@ impl Lexer {
                 self.position += 2;
             } else if self.is_number_current_char() {
                 //numebers
-
-                tokens.push(self.create_numbers());
+                if self.position > 0 {
+                    if tokens[tokens.len() - 1].get_type() != TokensTypes::TEXT {
+                        tokens.push(self.create_numbers());
+                    } else {
+                        tokens.push(Token::new(self.get_current_char(), TokensTypes::TEXT));
+                    }
+                } else {
+                    tokens.push(self.create_numbers());
+                }
             } else if self.get_current_char() == ":" {
                 tokens.push(Token::new(":".to_string(), TokensTypes::TWO_POINTS));
             } else if self.position + 1 < self.text.len()
